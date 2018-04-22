@@ -25,16 +25,25 @@ args = zoom.split(" ")
 camera.zoom = (float(args[0]),float(args[1]),float(args[2]),float(args[3])) 
 #print camera.zoom
 print (time.strftime("%H:%M:%S"))
-for i, filename in enumerate(camera.capture_continuous('/run/shm/image{timestamp:%H-%M-%S}.jpg',burst=True)):
-  #print(filename)
-  os.rename(filename,'/run/shm/image.jpg') 
-  inputFile = open('/run/shm/camera_params.txt', 'r')     
-  params = inputFile.readline().rstrip()
-  inputFile.close()
-  args = params.split(" ")
-  new_speed = int(args[4])
-  if old_speed != new_speed :
-    camera.shutter_speed = new_speed
-    old_speed = new_speed
-    print camera.shutter_speed
-  sleep(0.5)
+while True :
+    try:
+        for i, filename in enumerate(camera.capture_continuous('/run/shm/image{timestamp:%H-%M-%S}.jpg',burst=True)):
+        #print(filename)
+            os.rename(filename,'/run/shm/image.jpg') 
+            inputFile = open('/run/shm/camera_params.txt', 'r')     
+            params = inputFile.readline().rstrip()
+            inputFile.close()
+            args = params.split(" ")
+            new_speed = int(args[4])
+            if old_speed != new_speed :
+                camera.shutter_speed = new_speed
+                old_speed = new_speed
+            print camera.shutter_speed
+            sleep(0.5)
+    except (KeyboardInterrupt):
+       print "well, ok, if you don't really want to.."
+       break
+    except:
+       print "Some other error happened here"
+    sleep(5)
+
