@@ -38,7 +38,7 @@ while True :
             if old_speed != new_speed :
                 camera.shutter_speed = new_speed
                 old_speed = new_speed
-            print camera.shutter_speed
+                print camera.shutter_speed
             sleep(0.5)
     except (KeyboardInterrupt):
        print "well, ok, if you don't really want to.."
