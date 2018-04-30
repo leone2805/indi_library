@@ -24,7 +24,7 @@
 using namespace cv;
 using namespace std;
 
-const int POLLMS           = 500; /* Polling interval 500 ms */
+//const int POLLMS           = 500; /* Polling interval 500 ms */
 
 /* Macro shortcut to CCD temperature value */
 #define currentCCDTemperature TemperatureN[0].value
@@ -113,6 +113,7 @@ bool SimpleCCD::initProperties()
 
     // Add Debug, Simulator, and Configuration controls
     addAuxControls();
+    setDefaultPollingPeriod(500);
 
     return true;
 }
