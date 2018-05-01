@@ -152,12 +152,12 @@ bool FocusRpi::initProperties()
 {
     INDI::Focuser::initProperties();
 
-    IUFillNumber(&FocusAbsPosN[0],"FOCUS_ABSOLUTE_POSITION","Ticks","%0.0f",0,MAX_STEPS,(int)MAX_STEPS/200,0);
+    IUFillNumber(&FocusAbsPosN[0],"FOCUS_ABSOLUTE_POSITION","Ticks","%0.0f",0,MAX_STEPS,(int)MAX_STEPS/100,0);
     IUFillNumberVector(&FocusAbsPosNP,FocusAbsPosN,1,getDeviceName(),"ABS_FOCUS_POSITION","Position",MAIN_CONTROL_TAB,IP_RW,0,IPS_OK);
 
-	IUFillNumber(&PresetN[0], "Preset 1", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/1000), 0);
-	IUFillNumber(&PresetN[1], "Preset 2", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/1000), 0);
-	IUFillNumber(&PresetN[2], "Preset 3", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/1000), 0);
+	IUFillNumber(&PresetN[0], "Preset 1", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/100), 0);
+	IUFillNumber(&PresetN[1], "Preset 2", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/100), 0);
+	IUFillNumber(&PresetN[2], "Preset 3", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/100), 0);
 	IUFillNumberVector(&PresetNP, PresetN, 3, getDeviceName(), "Presets", "Presets", OPTIONS_TAB, IP_RW, 0, IPS_IDLE);
 
 	IUFillSwitch(&PresetGotoS[0], "Preset 1", "Preset 1", ISS_OFF);
@@ -205,6 +205,7 @@ bool FocusRpi::updateProperties()
 		defineSwitch(&FocusParkingSP);
 		defineSwitch(&FocusResetSP);
 	        defineSwitch(&PresetGotoSP);
+	        defineNumber(&PresetNP);
     }
     else
     {
@@ -214,6 +215,7 @@ bool FocusRpi::updateProperties()
 		deleteProperty(FocusParkingSP.name);
 		deleteProperty(FocusResetSP.name);
 	        deleteProperty(PresetGotoSP.name);	        
+	        deleteProperty(PresetNP.name);	        
     }
 
     return true;
@@ -508,3 +510,4 @@ bool FocusRpi::SetSpeed(int speed)
     }
 	return true;
 }
+
