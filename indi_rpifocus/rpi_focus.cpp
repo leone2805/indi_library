@@ -151,6 +151,9 @@ bool FocusRpi::Disconnect()
 bool FocusRpi::initProperties()
 {
     INDI::Focuser::initProperties();
+	
+    IUFillNumber(&MotorDelayN[0],"MOTOR_DELAY","milliseconds","%0.0f",2,50,1,4);
+    IUFillNumberVector(&MotorDelayNP,MotorDelayN,1,getDeviceName(),"MOTOR_CONFIG","Step Delay",OPTIONS_TAB,IP_RW,0,IPS_OK);
 
     IUFillNumber(&FocusAbsPosN[0],"FOCUS_ABSOLUTE_POSITION","Ticks","%0.0f",0,MAX_STEPS,(int)MAX_STEPS/100,0);
     IUFillNumberVector(&FocusAbsPosNP,FocusAbsPosN,1,getDeviceName(),"ABS_FOCUS_POSITION","Position",MAIN_CONTROL_TAB,IP_RW,0,IPS_OK);
