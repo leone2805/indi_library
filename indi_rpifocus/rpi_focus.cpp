@@ -155,6 +155,9 @@ bool FocusRpi::initProperties()
     IUFillNumber(&FocusRelPosN[0],"FOCUS_RELATIVE_POSITION","Ticks","%0.0f",0,(int)MAX_STEPS/100,(int)MAX_STEPS/1000,(int)MAX_STEPS/1000);
     IUFillNumberVector(&FocusRelPosNP,FocusRelPosN,1,getDeviceName(),"REL_FOCUS_POSITION","Relative",MAIN_CONTROL_TAB,IP_RW,60,IPS_OK);
 
+    IUFillSwitch(&FocusMotionS[0],"FOCUS_INWARD","Focus In",ISS_OFF);
+    IUFillSwitch(&FocusMotionS[1],"FOCUS_OUTWARD","Focus Out",ISS_ON);
+    IUFillSwitchVector(&FocusMotionSP,FocusMotionS,2,getDeviceName(),"FOCUS_MOTION","Direction",MAIN_CONTROL_TAB,IP_RW,ISR_ATMOST1,60,IPS_OK);
 	
     IUFillNumber(&PresetN[0], "Preset 1", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/100), 0);
     IUFillNumber(&PresetN[1], "Preset 2", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/100), 0);
@@ -201,22 +204,26 @@ bool FocusRpi::updateProperties()
     {
 	deleteProperty(FocusSpeedNP.name);
         defineNumber(&FocusAbsPosNP);
+	defineNumber(&FocusRelPosNP);
         defineSwitch(&FocusMotionSP);
 	defineNumber(&FocusBacklashNP);
 	defineSwitch(&FocusParkingSP);
 	defineSwitch(&FocusResetSP);
 	defineSwitch(&PresetGotoSP);
 	defineNumber(&PresetNP);
+	defineNumber(&MotorDelayNP);
     }
     else
     {
         deleteProperty(FocusAbsPosNP.name);
+	deleteProperty(FocusRelPosNP.name);
         deleteProperty(FocusMotionSP.name);
 	deleteProperty(FocusBacklashNP.name);
 	deleteProperty(FocusParkingSP.name);
 	deleteProperty(FocusResetSP.name);
 	deleteProperty(PresetGotoSP.name);	        
-	deleteProperty(PresetNP.name);	        
+	deleteProperty(PresetNP.name);
+	deleteProperty(MotorDelayNP.name);
     }
 
     return true;
@@ -294,7 +301,7 @@ bool FocusRpi::ISNewSwitch (const char *dev, const char *name, ISState *states, 
 	// first we check if it's for our device
     if (!strcmp(dev, getDeviceName()))
     {
-/*		
+		
         // handle focus motion in and out
         if (!strcmp(name, FocusMotionSP.name))
         {
@@ -308,14 +315,14 @@ bool FocusRpi::ISNewSwitch (const char *dev, const char *name, ISState *states, 
             if ( FocusMotionS[1].s == ISS_ON )
 				MoveRelFocuser(FOCUS_OUTWARD, FocusRelPosN[0].value);
 
-            //FocusMotionS[0].s = ISS_OFF;
-            //FocusMotionS[1].s = ISS_OFF;
+            FocusMotionS[0].s = ISS_OFF;
+            FocusMotionS[1].s = ISS_OFF;
 
-			FocusMotionSP.s = IPS_OK;
+	    FocusMotionSP.s = IPS_OK;
             IDSetSwitch(&FocusMotionSP, NULL);
             return true;
         }
-*/
+
         // handle focus presets
         if (!strcmp(name, PresetGotoSP.name))
         {
@@ -389,6 +396,7 @@ bool FocusRpi::saveConfigItems(FILE *fp)
     IUSaveConfigNumber(fp, &PresetNP);
     IUSaveConfigNumber(fp, &FocusBacklashNP);
     IUSaveConfigSwitch(fp, &FocusParkingSP);
+    IUSaveConfigNumber(fp, &MotorDelayNP);
 
     if ( FocusParkingS[0].s == ISS_ON )
 		IUSaveConfigNumber(fp, &FocusAbsPosNP);
