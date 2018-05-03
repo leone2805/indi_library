@@ -1,5 +1,5 @@
 /*******************************************************************************
-  Copyright(c) 2014 Radek Kaczorek  <rkaczorek AT gmail DOT com>
+  Copyright(c) 2018 Leone Di Mario  <leone DOT dimario AT gmail DOT com>
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Library General Public
@@ -24,15 +24,9 @@
 
 #include "rpi_focus.h"
 
-// We declare an auto pointer to focusRpi.
 std::unique_ptr<FocusRpi> focusRpi(new FocusRpi());
 
-// Stepper motor takes 4 miliseconds to move one step = 250 steps per second (real rate = 240,905660377)
-// 1) focusing from min to max takes 7 evolutions
-// 2) PG2528-0502U step motor makes 7 * (360deg/15degperstep)*72:1 = 1728 steps per evolution
-// 3) MAX_STEPS for 7 evolutions should be 12096
-
-#define MAX_STEPS 20000 // maximum steps focuser can travel from min=0 to max
+#define MAX_STEPS 20000 // maximum steps focuser
 
 #define STEP_DELAY 4 // milliseconds
 
@@ -158,28 +152,32 @@ bool FocusRpi::initProperties()
     IUFillNumber(&FocusAbsPosN[0],"FOCUS_ABSOLUTE_POSITION","Ticks","%0.0f",0,MAX_STEPS,(int)MAX_STEPS/100,0);
     IUFillNumberVector(&FocusAbsPosNP,FocusAbsPosN,1,getDeviceName(),"ABS_FOCUS_POSITION","Position",MAIN_CONTROL_TAB,IP_RW,0,IPS_OK);
 
-	IUFillNumber(&PresetN[0], "Preset 1", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/100), 0);
-	IUFillNumber(&PresetN[1], "Preset 2", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/100), 0);
-	IUFillNumber(&PresetN[2], "Preset 3", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/100), 0);
-	IUFillNumberVector(&PresetNP, PresetN, 3, getDeviceName(), "Presets", "Presets", OPTIONS_TAB, IP_RW, 0, IPS_IDLE);
+    IUFillNumber(&FocusRelPosN[0],"FOCUS_RELATIVE_POSITION","Ticks","%0.0f",0,(int)MAX_STEPS/100,(int)MAX_STEPS/1000,(int)MAX_STEPS/1000);
+    IUFillNumberVector(&FocusRelPosNP,FocusRelPosN,1,getDeviceName(),"REL_FOCUS_POSITION","Relative",MAIN_CONTROL_TAB,IP_RW,60,IPS_OK);
 
-	IUFillSwitch(&PresetGotoS[0], "Preset 1", "Preset 1", ISS_OFF);
-	IUFillSwitch(&PresetGotoS[1], "Preset 2", "Preset 2", ISS_OFF);
-	IUFillSwitch(&PresetGotoS[2], "Preset 3", "Preset 3", ISS_OFF);
-	IUFillSwitchVector(&PresetGotoSP, PresetGotoS, 3, getDeviceName(), "Presets Goto", "Goto", MAIN_CONTROL_TAB,IP_RW,ISR_1OFMANY,60,IPS_OK);
+	
+    IUFillNumber(&PresetN[0], "Preset 1", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/100), 0);
+    IUFillNumber(&PresetN[1], "Preset 2", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/100), 0);
+    IUFillNumber(&PresetN[2], "Preset 3", "", "%0.0f", 0, MAX_STEPS, (int)(MAX_STEPS/100), 0);
+    IUFillNumberVector(&PresetNP, PresetN, 3, getDeviceName(), "Presets", "Presets", OPTIONS_TAB, IP_RW, 0, IPS_IDLE);
 
-	IUFillNumber(&FocusBacklashN[0], "FOCUS_BACKLASH_VALUE", "Steps", "%0.0f", 0, (int)(MAX_STEPS/100), (int)(MAX_STEPS/10000), 0);
-	IUFillNumberVector(&FocusBacklashNP, FocusBacklashN, 1, getDeviceName(), "FOCUS_BACKLASH", "Backlash", OPTIONS_TAB, IP_RW, 0, IPS_IDLE);
+    IUFillSwitch(&PresetGotoS[0], "Preset 1", "Preset 1", ISS_OFF);
+    IUFillSwitch(&PresetGotoS[1], "Preset 2", "Preset 2", ISS_OFF);
+    IUFillSwitch(&PresetGotoS[2], "Preset 3", "Preset 3", ISS_OFF);
+    IUFillSwitchVector(&PresetGotoSP, PresetGotoS, 3, getDeviceName(), "Presets Goto", "Goto", MAIN_CONTROL_TAB,IP_RW,ISR_1OFMANY,60,IPS_OK);
 
-	IUFillSwitch(&FocusResetS[0],"FOCUS_RESET","Reset",ISS_OFF);
-	IUFillSwitchVector(&FocusResetSP,FocusResetS,1,getDeviceName(),"FOCUS_RESET","Position Reset",OPTIONS_TAB,IP_RW,ISR_1OFMANY,60,IPS_OK);
+    IUFillNumber(&FocusBacklashN[0], "FOCUS_BACKLASH_VALUE", "Steps", "%0.0f", 0, (int)(MAX_STEPS/100), (int)(MAX_STEPS/10000), 0);
+    IUFillNumberVector(&FocusBacklashNP, FocusBacklashN, 1, getDeviceName(), "FOCUS_BACKLASH", "Backlash", OPTIONS_TAB, IP_RW, 0, IPS_IDLE);
 
-	IUFillSwitch(&FocusParkingS[0],"FOCUS_PARKON","Enable",ISS_OFF);
-	IUFillSwitch(&FocusParkingS[1],"FOCUS_PARKOFF","Disable",ISS_OFF);
-	IUFillSwitchVector(&FocusParkingSP,FocusParkingS,2,getDeviceName(),"FOCUS_PARK","Parking Mode",OPTIONS_TAB,IP_RW,ISR_1OFMANY,60,IPS_OK);
+    IUFillSwitch(&FocusResetS[0],"FOCUS_RESET","Reset",ISS_OFF);
+    IUFillSwitchVector(&FocusResetSP,FocusResetS,1,getDeviceName(),"FOCUS_RESET","Position Reset",OPTIONS_TAB,IP_RW,ISR_1OFMANY,60,IPS_OK);
 
-	// set capabilities
-        //SetFocuserCapability(FOCUSER_CAN_ABS_MOVE | FOCUSER_CAN_REL_MOVE);
+    IUFillSwitch(&FocusParkingS[0],"FOCUS_PARKON","Enable",ISS_OFF);
+    IUFillSwitch(&FocusParkingS[1],"FOCUS_PARKOFF","Disable",ISS_OFF);
+    IUFillSwitchVector(&FocusParkingSP,FocusParkingS,2,getDeviceName(),"FOCUS_PARK","Parking Mode",OPTIONS_TAB,IP_RW,ISR_1OFMANY,60,IPS_OK);
+
+    // set capabilities
+    //SetFocuserCapability(FOCUSER_CAN_ABS_MOVE | FOCUSER_CAN_REL_MOVE);
 
     return true;
 }
@@ -201,24 +199,24 @@ bool FocusRpi::updateProperties()
 
     if (isConnected())
     {
-		deleteProperty(FocusSpeedNP.name);
+	deleteProperty(FocusSpeedNP.name);
         defineNumber(&FocusAbsPosNP);
         defineSwitch(&FocusMotionSP);
-		defineNumber(&FocusBacklashNP);
-		defineSwitch(&FocusParkingSP);
-		defineSwitch(&FocusResetSP);
-	        defineSwitch(&PresetGotoSP);
-	        defineNumber(&PresetNP);
+	defineNumber(&FocusBacklashNP);
+	defineSwitch(&FocusParkingSP);
+	defineSwitch(&FocusResetSP);
+	defineSwitch(&PresetGotoSP);
+	defineNumber(&PresetNP);
     }
     else
     {
         deleteProperty(FocusAbsPosNP.name);
         deleteProperty(FocusMotionSP.name);
-		deleteProperty(FocusBacklashNP.name);
-		deleteProperty(FocusParkingSP.name);
-		deleteProperty(FocusResetSP.name);
-	        deleteProperty(PresetGotoSP.name);	        
-	        deleteProperty(PresetNP.name);	        
+	deleteProperty(FocusBacklashNP.name);
+	deleteProperty(FocusParkingSP.name);
+	deleteProperty(FocusResetSP.name);
+	deleteProperty(PresetGotoSP.name);	        
+	deleteProperty(PresetNP.name);	        
     }
 
     return true;
@@ -233,7 +231,7 @@ bool FocusRpi::ISNewNumber (const char *dev, const char *name, double values[], 
         // handle focus absolute position
         if (!strcmp(name, FocusAbsPosNP.name))
         {
-			int newPos = (int) values[0];
+	    int newPos = (int) values[0];
             if ( MoveAbsFocuser(newPos) == IPS_OK )
             {
                IUUpdateNumber(&FocusAbsPosNP,values,names,n);
@@ -246,15 +244,15 @@ bool FocusRpi::ISNewNumber (const char *dev, const char *name, double values[], 
         // handle focus relative position
         if (!strcmp(name, FocusRelPosNP.name))
         {
-			IUUpdateNumber(&FocusRelPosNP,values,names,n);
+	    IUUpdateNumber(&FocusRelPosNP,values,names,n);
 			
 			//FOCUS_INWARD
             if ( FocusMotionS[0].s == ISS_ON )
-				MoveRelFocuser(FOCUS_INWARD, FocusRelPosN[0].value);
+			MoveRelFocuser(FOCUS_INWARD, FocusRelPosN[0].value);
 
 			//FOCUS_OUTWARD
             if ( FocusMotionS[1].s == ISS_ON )
-				MoveRelFocuser(FOCUS_OUTWARD, FocusRelPosN[0].value);
+			MoveRelFocuser(FOCUS_OUTWARD, FocusRelPosN[0].value);
 
 			FocusRelPosNP.s=IPS_OK;
 			IDSetNumber(&FocusRelPosNP, NULL);
@@ -264,15 +262,15 @@ bool FocusRpi::ISNewNumber (const char *dev, const char *name, double values[], 
         // handle focus timer
         if (!strcmp(name, FocusTimerNP.name))
         {
-			IUUpdateNumber(&FocusTimerNP,values,names,n);
+            IUUpdateNumber(&FocusTimerNP,values,names,n);
 
 			//FOCUS_INWARD
             if ( FocusMotionS[0].s == ISS_ON )
-				MoveFocuser(FOCUS_INWARD, 0, FocusTimerN[0].value);
+			MoveFocuser(FOCUS_INWARD, 0, FocusTimerN[0].value);
 
 			//FOCUS_OUTWARD
             if ( FocusMotionS[1].s == ISS_ON )
-				MoveFocuser(FOCUS_OUTWARD, 0, FocusTimerN[0].value);
+			MoveFocuser(FOCUS_OUTWARD, 0, FocusTimerN[0].value);
 
 			FocusTimerNP.s=IPS_OK;
 			IDSetNumber(&FocusTimerNP, NULL);
@@ -390,7 +388,7 @@ bool FocusRpi::saveConfigItems(FILE *fp)
     IUSaveConfigNumber(fp, &FocusRelPosNP);
     IUSaveConfigNumber(fp, &PresetNP);
     IUSaveConfigNumber(fp, &FocusBacklashNP);
-	IUSaveConfigSwitch(fp, &FocusParkingSP);
+    IUSaveConfigSwitch(fp, &FocusParkingSP);
 
     if ( FocusParkingS[0].s == ISS_ON )
 		IUSaveConfigNumber(fp, &FocusAbsPosNP);
@@ -400,7 +398,7 @@ bool FocusRpi::saveConfigItems(FILE *fp)
 
 IPState FocusRpi::MoveFocuser(FocusDirection dir, int speed, int duration)
 {
-	int ticks = (int) ( duration / STEP_DELAY);
+    int ticks = (int) ( duration / STEP_DELAY);
     return 	MoveRelFocuser( dir, ticks);
 }
 
