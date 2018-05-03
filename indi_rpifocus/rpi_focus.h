@@ -31,8 +31,11 @@ class FocusRpi : public INDI::Focuser
         ISwitch FocusParkingS[2];
         ISwitchVectorProperty FocusParkingSP;
  
-		INumber FocusBacklashN[1];
-		INumberVectorProperty FocusBacklashNP; 
+	INumber FocusBacklashN[1];
+	INumberVectorProperty FocusBacklashNP;
+	
+	INumber MotorDelayN[1];
+        INumberVectorProperty MotorDelayNP;
     public:
         FocusRpi();
         virtual ~FocusRpi();
@@ -50,7 +53,7 @@ class FocusRpi : public INDI::Focuser
         virtual bool ISSnoopDevice(XMLEle *root);
         virtual bool saveConfigItems(FILE *fp);
 
-		virtual IPState MoveFocuser(FocusDirection dir, int speed, int duration);
+	virtual IPState MoveFocuser(FocusDirection dir, int speed, int duration);
         virtual IPState MoveAbsFocuser(int ticks);
         virtual IPState MoveRelFocuser(FocusDirection dir, int ticks);
         virtual bool SetSpeed(int speed);
