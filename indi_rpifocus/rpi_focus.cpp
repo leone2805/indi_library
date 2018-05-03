@@ -27,9 +27,6 @@
 std::unique_ptr<FocusRpi> focusRpi(new FocusRpi());
 
 #define MAX_STEPS 20000 // maximum steps focuser
-
-#define STEP_DELAY 4 // milliseconds
-
 #define DIR 5	// GPIO24
 #define STEP 4	// GPIO23
 
@@ -146,7 +143,7 @@ bool FocusRpi::initProperties()
 {
     INDI::Focuser::initProperties();
 	
-    IUFillNumber(&MotorDelayN[0],"MOTOR_DELAY","milliseconds","%0.0f",2,50,1,4);
+    IUFillNumber(&MotorDelayN[0],"MOTOR_DELAY","milliseconds","%0.0f",1,50,1,2);
     IUFillNumberVector(&MotorDelayNP,MotorDelayN,1,getDeviceName(),"MOTOR_CONFIG","Step Delay",OPTIONS_TAB,IP_RW,0,IPS_OK);
 
     IUFillNumber(&FocusAbsPosN[0],"FOCUS_ABSOLUTE_POSITION","Ticks","%0.0f",0,MAX_STEPS,(int)MAX_STEPS/100,0);
@@ -406,7 +403,7 @@ bool FocusRpi::saveConfigItems(FILE *fp)
 
 IPState FocusRpi::MoveFocuser(FocusDirection dir, int speed, int duration)
 {
-    int ticks = (int) ( duration / STEP_DELAY);
+    int ticks = (int) ( duration / MotorDelayN[0].value );
     return 	MoveRelFocuser( dir, ticks);
 }
 
@@ -467,11 +464,11 @@ IPState FocusRpi::MoveAbsFocuser(int targetTicks)
 			// step on
 			digitalWrite(STEP, HIGH);
 			// wait
-			delay(STEP_DELAY/2);
+			usleep(MotorDelayN[0].value * 1000);
 			// step off
 			digitalWrite(STEP, LOW);
 			// wait 
-			delay(STEP_DELAY/2);
+			usleep(MotorDelayN[0].value * 1000);
 		}
 	}
 
@@ -483,11 +480,11 @@ IPState FocusRpi::MoveAbsFocuser(int targetTicks)
         // step on
 	digitalWrite(STEP, HIGH);
         // wait
-        delay(STEP_DELAY/2);
+	usleep(MotorDelayN[0].value * 1000);
         // step off
 	digitalWrite(STEP, LOW);
         // wait 
-        delay(STEP_DELAY/2);
+        usleep(MotorDelayN[0].value * 1000);
 
 		// INWARD - count down
 		if ( digitalRead(DIR) == HIGH )
