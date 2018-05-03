@@ -1,5 +1,5 @@
 /*******************************************************************************
-  Copyright(c) 2014 Radek Kaczorek  <rkaczorek AT gmail DOT com>
+   Copyright(c) 2018 Leone Di Mario  <leone DOT dimario AT gmail DOT com>
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Library General Public
@@ -31,8 +31,11 @@ class FocusRpi : public INDI::Focuser
         ISwitch FocusParkingS[2];
         ISwitchVectorProperty FocusParkingSP;
  
-		INumber FocusBacklashN[1];
-		INumberVectorProperty FocusBacklashNP; 
+	INumber FocusBacklashN[1];
+	INumberVectorProperty FocusBacklashNP;
+	
+	INumber MotorDelayN[1];
+        INumberVectorProperty MotorDelayNP;
     public:
         FocusRpi();
         virtual ~FocusRpi();
@@ -50,7 +53,7 @@ class FocusRpi : public INDI::Focuser
         virtual bool ISSnoopDevice(XMLEle *root);
         virtual bool saveConfigItems(FILE *fp);
 
-		virtual IPState MoveFocuser(FocusDirection dir, int speed, int duration);
+	virtual IPState MoveFocuser(FocusDirection dir, int speed, int duration);
         virtual IPState MoveAbsFocuser(int ticks);
         virtual IPState MoveRelFocuser(FocusDirection dir, int ticks);
         virtual bool SetSpeed(int speed);
