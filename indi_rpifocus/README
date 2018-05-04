@@ -32,8 +32,8 @@ All devices have been connected to Raspberry Pi 3 running Ubuntu Mate
 * Stepper motor - BY28 with unipolar modification
 * Stepper motor controller - A4988
   Wiring Raspberry Pi to the motor controller:
-  GPIO04 - DIR
-  GPIO17 - STEP
+  GPIO24 - DIR
+  GPIO23 - STEP
   
   Note: Make sure you connect the stepper motor correctly to the controller (B2, B1 and A2, A1 pins on the controller).
         Remember to protect the 5V power line connected to VMOT pin on the motor controller with 100uF capacitor.
