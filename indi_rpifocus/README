@@ -1,11 +1,11 @@
-INDI Astroberry 1.0.5
+INDI LDM Focuser 1.1
 =================================
-This package provides the INDI drivers for Raspberry Pi devices:
-* Astroberry Focuser - stepper motor driver with absolute and relative position capabilities and autofocus with INDI client such as KStars and Ekos
+This package provides the INDI drivers for Raspberry Pi LDMFocuser device:
+* LDM Focuser - stepper motor driver with absolute and relative position capabilities and autofocus with INDI client such as KStars and Ekos
 
 ============
 v1.1
-all		- Initial release of astroberry drivers
+all		- Initial release of LDM Focuser drivers
 
 Requirements
 ============
@@ -13,29 +13,27 @@ Requirements
 
 How to Use
 ==========
-Once installed, the Astroberry INDI drivers can be used by an INDI client such as. 
+Once installed, the LDM INDI drivers can be used by an INDI client such as. 
 It can also be used manually by invoking it via the indi_server:
 $ indi_server indi_rpifocus
 
 
 Important!!!
 ============
-Astroberry drivers are dedicated for controlling Raspberry Pi based devices. Drivers access various GPIO pins. Make sure 
+LDM drivers are dedicated for controlling Raspberry Pi based devices. Drivers access various GPIO pins. Make sure 
 that you use appropriate hardware devices connected to correct Raspberry Pi GPIO pins before running these drivers.
 See Hardware specs below for detailed hardware and wiring instructions.
 
-Hardware specs for Astroberry drivers
+Hardware specs for LDM drivers
 ======================================
 All devices have been connected to Raspberry Pi 3 running Ubuntu Mate
 
-1. Astroberry Focuser
-* Stepper motor - PG2528-0502U 5V 0.2A 0,5Nm (with builtin gear 76:1)
-* Stepper motor controller - Low-Voltage DRV8834 10,8V 2A.
+1. LDM Focuser
+* Stepper motor - BY28 with unipolar modification
+* Stepper motor controller - A4988
   Wiring Raspberry Pi to the motor controller:
   GPIO04 - DIR
   GPIO17 - STEP
-  GPIO22 - M0
-  GPIO27 - M1
-  GPIO23 - SLEEP
+  
   Note: Make sure you connect the stepper motor correctly to the controller (B2, B1 and A2, A1 pins on the controller).
         Remember to protect the 5V power line connected to VMOT pin on the motor controller with 100uF capacitor.
