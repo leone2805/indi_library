@@ -289,6 +289,16 @@ bool FocusRpi::ISNewNumber (const char *dev, const char *name, double values[], 
             IDSetNumber(&FocusBacklashNP, "LDM Focuser backlash set to %d", (int) FocusBacklashN[0].value);
             return true;
         }
+        
+        // handle motor delay
+        if (!strcmp(name, MotorDelayNP.name))
+        {
+            IUUpdateNumber(&MotorDelayNP,values,names,n);
+            MotorDelayNP.s=IPS_OK;
+            IDSetNumber(&MotorDelayNP, "LDM Focuser motor delay set to %d", (int) MotorDelayN[0].value);
+            return true;
+        }
+
 	}
     return INDI::Focuser::ISNewNumber(dev,name,values,names,n);
 }
