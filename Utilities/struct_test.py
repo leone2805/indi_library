@@ -6,6 +6,7 @@ refPt = []
 
 WIDTH=101
 HEIGHT=67
+SCALE=2.5
 
 def nothing(x):
     pass
@@ -27,8 +28,6 @@ def click_and_crop(event, x, y, flags, param):
 
 f = open('Downloads/indi_record_2018-05-12@17-57-15.ser','rb')
 file_id, lu_id, color_id, little_endian, image_width, image_height, pixel_depth, frame_count, observer, instrument, telescope, local_date, utc_date = struct.unpack('<14s 7I 40s 40s 40s 2Q',f.read(178))
-WIDTH = image_width/10
-HEIGHT = image_height/10
 #img = np.fromfile(f, dtype=np.uint8, count=2088960)
 img = np.fromfile(f, dtype=np.uint8, count=image_width*image_height*3)
 #print img.shape
@@ -40,6 +39,10 @@ img = cv2.equalizeHist(img)
 #print f.tell()
 #print struct.unpack('<10Q',f.read(80))
 #print img.shape
+img = cv2.resize(img,None,fx=1/SCALE, fy=1/SCALE)
+#img = img[50:50+100, 50:50+300]
+WIDTH = int(image_width/10/SCALE)
+HEIGHT = int(image_height/10/SCALE)
 clone = img.copy()
 cv2.namedWindow('img')
 cv2.setMouseCallback('img', click_and_crop)
@@ -62,4 +65,4 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 #print np.array(refPt, dtype=int)*5
 #print refPt
-print str(refPt[0][0]*5)+","+str(refPt[0][1]*5)
+print str(int(refPt[0][0]*5*SCALE))+","+str(int(refPt[0][1]*5*SCALE))
