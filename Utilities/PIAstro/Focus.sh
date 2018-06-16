@@ -11,4 +11,14 @@ case $DIR in
     exit 1 ;;
 esac
 
-indi_setprop -h $HOST "LDM Focuser.FOCUS_MOTION.FOCUS_${DIR}WARD=On"
+POS=$2
+if [ -z $POS ]
+then
+  POS=0
+fi
+
+timeout 3 indi_setprop -h $HOST "LDM Focuser.FOCUS_MOTION.FOCUS_INWARD=Off"
+timeout 3 indi_setprop -h $HOST "LDM Focuser.FOCUS_MOTION.FOCUS_OUTWARD=Off"
+timeout 3 indi_setprop -h $HOST "LDM Focuser.REL_FOCUS_POSITION.FOCUS_RELATIVE_POSITION=$POS"
+
+timeout 3 indi_setprop -h $HOST "LDM Focuser.FOCUS_MOTION.FOCUS_${DIR}WARD=On"
